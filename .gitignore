@@ -1,3 +1,11 @@
+*~
+\#*\#
+.\#*
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
 /documents/ltximg/
 /documents/notes/ltximg/
 /backups/
