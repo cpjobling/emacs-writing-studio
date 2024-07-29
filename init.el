@@ -100,9 +100,9 @@
 ;;; LOOK AND FEEL
 ;; Keyboard-centric user interface removing tool, menu and scroll bars
 
-(tool-bar-mode -1)
-(menu-bar-mode -1)
-(scroll-bar-mode -1)
+(tool-bar-mode t)
+(menu-bar-mode t)
+(scroll-bar-mode t)
 
 ;; Short answers only please
 
