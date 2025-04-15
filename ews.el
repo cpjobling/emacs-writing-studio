@@ -1,11 +1,11 @@
 ;;; ews.el --- Convenience functions for authors  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2024 Peter Prevos
+;; Copyright (C) 2025 Peter Prevos
 
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Created: 1 January 2024
-;; Version: 1.2
+;; Version: 1.0
 ;; Keywords: convenience
 ;; Homepage: https://lucidmanager.org/tags/emacs/
 ;; URL: https://github.com/pprevos/emacs-writing-studio
@@ -56,14 +56,9 @@
   :group 'ews
   :type 'list)
 
-(defcustom ews-org-completed-action "DONE"
-  "Completed action that triggers resetting checkboxes for recurring tasks."
-  :group 'ews
-  :type 'string)
-
 (defcustom ews-org-heading-level-capitalise nil
-  "Minimum level of Org headings to be capitalised.
-'nil implies all levels are capitalised."
+  "Minimum level of Org headings to be capitalised
+Nil implies all levels are capitalised."
   :group 'ews
   :type  '(choice (const :tag "All headings" nil)
 		  (integer :tag "Highest level" 1)))
@@ -71,7 +66,7 @@
 ;; Check for missing external software
 ;;;###autoload
 (defun ews-missing-executables (prog-list)
-  "Identified missing executables in PROG-LIST.
+  "Identify missing executables in PROG-LIST.
 Sublists indicate that one of the entries is required."
   (let ((missing '()))
     (dolist (exec prog-list)
@@ -82,18 +77,19 @@ Sublists indicate that one of the entries is required."
           (push exec missing))))
     (if missing
         (message "Missing executable files(s): %s"
-                 (mapconcat 'identity missing ", ")))))
+                 (mapconcat 'identity missing ", "))
+      (message "No missing executable files."))))
 
 ;;; BIBLIOGRAPHY
 (defvar ews-bibtex-files
   (when (file-exists-p ews-bibtex-directory)
     (directory-files ews-bibtex-directory t "^[A-Z|a-z|0-9].+.bib$"))
-  "List of BibTeX files. Use `ews-bibtex-register-files` to configure.")
+  "List of BibTeX files. Use `ews-bibtex-register' to configure.")
 
 ;;;###autoload
 (defun ews-bibtex-register ()
-  "Register the contents of the `ews-bibtex-directory` with `ews-bibtex-files`.
-Use when adding or removing a BibTeX file from or to `ews-bibtex-directory`."
+  "Register the contents of the `ews-bibtex-directory' with `ews-bibtex-files`.
+Use when adding or removing a BibTeX file from or to `ews-bibtex-directory'."
   (interactive)
   (when (file-exists-p ews-bibtex-directory)
     (let ((bib-files (directory-files ews-bibtex-directory t
@@ -104,7 +100,8 @@ Use when adding or removing a BibTeX file from or to `ews-bibtex-directory`."
   (message "Registered:\n%s" (mapconcat #'identity ews-bibtex-files "\n")))
 
 (defun ews--bibtex-combined-biblio-lookup ()
-  "Combines biblio-lookup and biblio-doi-insert-bibtex."
+  "Combines `biblio-lookup' and `biblio-doi-insert-bibtex'."
+  (require 'biblio)
   (let* ((dbs (biblio--named-backends))
          (db-list (append dbs '(("DOI" . biblio-doi-backend))))
          (db-selected (biblio-completing-read-alist
@@ -117,7 +114,7 @@ Use when adding or removing a BibTeX file from or to `ews-bibtex-directory`."
 
 ;;;###autoload
 (defun ews-bibtex-biblio-lookup ()
-  "Use curent buffer or Select BibTeX file, lookup with Biblio and insert entry."
+  "Insert Biblio search results into current buffer or select BibTeX file."
   (interactive)
   (if-let ((current-mode major-mode)
 	   ews-bibtex-files
@@ -134,7 +131,7 @@ Use when adding or removing a BibTeX file from or to `ews-bibtex-directory`."
     (message "No BibTeX file(s) defined.")))
 
 ;; Search for missing BibTeX attachments and filenames
-(defun ews--bibtex-extract-filenames ()
+(defun ews--bibtex-extract-attachments ()
   "Extract attachment file names from BibTeX files in `ews-bibtex-directory'."
   (ews-bibtex-register)
   (let ((attachments '()))
@@ -152,37 +149,42 @@ Use when adding or removing a BibTeX file from or to `ews-bibtex-directory`."
     attachments))
 
 (defun ews--bibtex-extract-files ()
-  "List files recursively in `ews-bibtex-directory'.  Excludes `.bib` and `.csl`."
+  "List files recursively in `ews-bibtex-directory', excluding `.bib' and `.csl'."
   (seq-remove (lambda (file)
                 (or (string-suffix-p ".bib" file)
                     (string-suffix-p ".csl" file)))
-              (directory-files-recursively ews-bibtex-directory "")))
+              (mapcar 'expand-file-name
+                      (directory-files-recursively ews-bibtex-directory ""))))
 
+;;;###autoload
 (defun ews-bibtex-missing-files ()
-  "List BibTeX attachments not listed in BibTeX files."
+  "List BibTeX attachments not listed in a BibTeX file entry."
   (interactive)
   (let* ((files (ews--bibtex-extract-files))
-         (attachments (ews--bibtex-extract-filenames))
+         (attachments (ews--bibtex-extract-attachments))
          (missing (cl-remove-if
                    (lambda (f) (member f attachments)) files)))
     (message "%s files not registered in bibliography" (length missing))
     (dolist (file missing)
-      (message "Missing file: %s" file))))
+      (message file))))
 
+;;;###autoload
 (defun ews-bibtex-missing-attachments ()
-  "List BibTeX files without matching attachment."
+  "List BibTeX file entries with missing attachment(s)."
   (interactive)
   (let* ((files (ews--bibtex-extract-files))
-         (attachments (ews--bibtex-extract-filenames))
+         (attachments (ews--bibtex-extract-attachments))
          (missing (cl-remove-if
                    (lambda (f) (member f files)) attachments)))
     (message "%s BibTeX files without matching attachment." (length missing))
     (dolist (file missing)
-      (message "Missing file: %s" file))))
+      (message file))))
 
 ;; Denote
+;;;###autoload
 (defun ews-denote-assign-para ()
-  "Move your note to either Project, Area, Reource or Archive (PARA)."
+  "Move your note to either Project, Area, Reource or Archive (PARA).
+Configure the PARA names with `ews-denote-para-keywords'."
   (interactive)
   (if-let* ((file (buffer-file-name))
             ((denote-filename-is-note-p file))
@@ -198,16 +200,6 @@ Use when adding or removing a BibTeX file from or to `ews-bibtex-directory`."
        new-keywords
        (denote-retrieve-filename-signature file))
     (message "Current buffer is not a Denote file.")))
-
-;; Narrow Dired to Regular Expression
-(defun ews-dired-narrow (selection)
-  "Mark files in denote-firectory using a regular expression."
-  (interactive "sMark files (regexp):")
-  (when (not (eq major-mode 'dired-mode))
-    (dired denote-directory))
-  (dired-mark-files-regexp selection)
-  (dired-toggle-marks)
-  (dired-do-kill-lines))
 
 ;; Distraction-free writing
 (defvar ews-olivetti-point nil
@@ -268,7 +260,7 @@ current note."
 
 ;;;###autoload
 (defun ews-org-insert-screenshot ()
-  "Take a screenshot with ImageMagick and insert as an Org mode link."
+  "Take a screenshot with the maim program and insert as an Org mode link."
   (interactive)
   (let ((filename (read-file-name "Enter filename for screenshot: " default-directory)))
     (unless (string-equal "png" (file-name-extension filename))
@@ -278,30 +270,13 @@ current note."
     (insert (format "[[file:%s]]" filename))
     (org-redisplay-inline-images)))
 
-;;; Org mode todo enhancements
-(defun ews--org-recurring-action-p ()
-  "Returns non-nil when the action under point is recurring."
-  (let ((timestamp (or (org-entry-get nil "SCHEDULED" t)
-                       (org-entry-get nil "DEADLINE" t))))
-    (if timestamp (string-match-p "\\+" timestamp))))
-
-;;;###autoload
-(defun ews-org-reset-checkboxes-when-done ()
-  "Reset all checkboxes in the subtree when status changes."
-  (when (and (ews--org-recurring-action-p)
-             (equal ews-org-completed-action
-                    (substring-no-properties (org-get-todo-state))))
-    (org-reset-checkbox-state-subtree)))
-
-(add-hook #'org-after-todo-state-change-hook
-          #'ews-org-reset-checkboxes-when-done)
-
 ;;;###autoload
 (defun ews-org-headings-titlecase (&optional arg)
   "Cycle through all headings in an Org buffer and convert them to title case.
-When used with universal argument converts to sentence case.
+When used with universal argument (ARG) converts to sentence case.
 Customise `titlecase-style' for styling."
   (interactive "P")
+  (require 'titlecase)
   (let ((style (if arg 'sentence titlecase-style)))
     (message "Converting headings to '%s' style" style)
     (org-map-entries
@@ -312,3 +287,24 @@ Customise `titlecase-style' for styling."
               (new-heading (titlecase--string heading-lower style)))
 	 (when (<= level (or ews-org-heading-level-capitalise 999))
 	   (org-edit-headline new-heading)))))))
+
+(defun ews-denote-link-description-title-case (file)
+  "Return link description for FILE.
+
+If the region is active, use it as the description.
+The title is formatted with the `titlecase' package.
+
+This function is useful as the value of `denote-link-description-function' to
+generate links in titlecase for attachments."
+  (require 'titlecase)
+  (let* ((file-type (denote-filetype-heuristics file))
+         (title (denote-retrieve-title-or-filename file file-type))
+	 (clean-title (if (string-match-p " " title)
+			  title
+			(replace-regexp-in-string "\\([a-zA-Z0-9]\\)-\\([a-zA-Z0-9]\\)" "\\1 \\2" title)))
+         (region-text (denote--get-active-region-content)))
+    (cond
+     (region-text region-text)
+     (title (format "%s" (titlecase--string clean-title titlecase-style)))
+     (t ""))))
+

@@ -1,55 +1,92 @@
 #+title: Emacs Writing Studio
 #+author: Peter Prevos
 
-/Emacs Writing Studio/ (EWS) is a configuration for researchers and authors who want to use Emacs to write and publish articles, books and dissertations. EWS is also a forthcoming ebook and paperback, which is an expanded version of a [[https://lucidmanager.org/tags/emacs/][series of articles]] on my website.
+/Emacs Writing Studio/ by Peter Prevos is a configuration and comprehensive manual for writers seeking an integrated research, writing and publication tool. The EWS book discusses everything from researching and organising ideas and writing without distractions to publishing in multiple formats. EWS is useful to beginners and experienced Emacs users, offering practical tips and a tailored configuration to enhance your writing process.
 
-This configuration follows the following principles:
-
-- Stays as close as humanly bearable to vanilla GNU Emacs
-- Leverage functionality in Emacs 29
-- Standard keyboard shortcuts
-- No configuration for writing code
-- Centred around Org mode
- 
 #+attr_html: :alt Emacs Writing Studio logo :title Emacs Writing Studio logo :width 400
 #+attr_org: :width 200
 [[file:emacs-writing-studio.png]]
 
-I am currently working on an /Emacs Writing Studio/ book based on the website. The Org mode source code is available in the =documents= folder. The books is written with the EWS configuration and will be available as ebook and paperback when completed.
+If you like to support my work, then please purchase the EWS book from your [[https://books2read.com/b/4NpgQ9][favourite e-book retailer]] or a DRM-free download from [[https://payhip.com/b/alhIJ][PayHip]] or [[https://leanpub.com/emacswritingstudio][LeanPub]]. The Org mode source code of the book is freely available in the =documents= folder, so you can also 'roll your own' with the Org export functionality and associated external software (see below).
 
-Feel free to raise an issue if you have any suggestions on how to enhance the configuration or like to see additional packages useful to authors.
+The [[https://lucidmanager.org/tags/emacs][EWS website]] explains the configuration. There is also a [[https://www.youtube.com/watch?v=VGGYS09tlKA&list=PLGx4TR_jvOQDIT878vGDe1ElUlij3UEKI&pp=gAQB][YouTube playlist]] to demonstrate how to use /Emacs Writing Studio/.
+
+This repository is not a maintained Emacs package. For beginning Emacs users, it acts as a starting point to develop a configuration. More advanced users can copy ideas. The code will only be updated when there are bugs due to future changes in packages or Emacs itself.
+
+The EWS configuration follows the following principles:
+
+- Stay as close as humanly bearable to vanilla GNU Emacs
+- Leverage functionality of the latest Emacs version
+- Standard keyboard shortcuts
+- No configuration for writing code (~prog-mode~)
+- Centred around Org mode
+ 
+Feel free to raise an issue if you have any suggestions on how to enhance the configuration, like to include additional packages useful to authors or fix some typos in the text.
+
+#+begin_export html
+<iframe width="560" height="315" src="https://www.youtube.com/embed/5IJVDCpE3vA?si=rCu4Pon9PyrwLMix" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+#+end_export
+
+* EWS Workflow
+The EWS configuration, associated website and book follow a basic workflow for authoring documents, visualised below.
+
+[[file:documents/book/images/emacs-workflow.png]]
+
+- /Inspiration/ relates to reading, listening to and watching media such as e-books or lectures. Emacs can maintain and consume your bibliography or media collection.
+- /Ideation/ is the phase where we reflect on the ideas of others and develop our own. Emacs acts as a note-taling system in this phase.
+- /Production/ is the actual writing phase. EWS focuses on the capabilities of the Org mode package for writing projects.
+- /Publication/ is the last phase in which Org mode files are converted to the final product in ePub, PDF or office format.
+
+Another part of being a researcher and writer is /Administration/, which is not a phase in the process as such, but nevertheless essential. Administration in the EWS context relates to managing files and projects.
 
 * Install EWS
-To install the EWS configuration, download the =init.el= and =ews.el= files from the GitHub repository and save them in the configuration folder.
+The =init.el= file contains the basic configuration and =ews.el= defines a series of convenience functions.
 
-The location of the configuration folder depends on your operating system and Emacs version. Type =C-h v user-emacs-directory= to identify its location in the popup help buffer. You can close this buffer by pressing =q=.
+To install the EWS configuration, download the =init.el= and =ews.el= files from this GitHub repository and save them in the configuration folder. The location of the configuration folder depends on your operating system and Emacs version. Type =C-h v user-emacs-directory= to identify its location in the popup help buffer.
 
-Copy both files from the EWS repository to this directory. EWS will activate after you evaluate the ~restart-emacs~ function or the next time you start the program.
+EWS activates and installs the required packages after you evaluate the ~restart-emacs~ function or the next time you start the program.
 
-If you an experienced Emacs user, then you can try the EWS configuration by cloning this repository and start Emacs with =emacs --init-directory <folder-path>=. That way you can try EWS without clobbering your existing configuration.
+Experienced Emacs users, can try EWS configuration, without clobbering your existing configuration:
 
-* External Packages
-Emacs is not only a text editor but also an interface to other software. EWS depends on external software that Emacs interfaces with to do various tasks.
+#+begin_src shell
+  git clone https://github.com/pprevos/emacs-writing-studio
+  emacs --init-directory emacs-writing-studio
+#+end_src
 
-When EWS starts, a message will appear in the =*Messages*= buffer listing the missing software. Some of the listed packages are alternatives for each other, for example (=convert= or =gm=). The core functionality of Emacs will work fine without these, but some specialised tasks require assistance from this software.
+* Supporting Applications
+Emacs is not only a text editor but also an interface to other software. EWS interface with software that Emacs uses for various tasks.
 
-- =soffice= ([[https://www.libreoffice.org/][LibreOffice]]): View and create office documents
-- =zip=: Unpack ePub documents
-- =pdftotext= ([[https://poppler.freedesktop.org/][poppler-utils]]): Convert PDF to text
-- =djvu= ([[http://djvu.org/][DjVuLibre]]): View DjVu files
-- =curl=: Reading RSS feeds
-- =dot= ([[https://graphviz.org/][GraphViz]]): Create note network diagrams
-- Convert image files
-  - =convert= ([[https://imagemagick.org/][ImageMagick]])  
-  - =gm= ([[http://www.graphicsmagick.org/][GraphicsMagick]])
-- =latex= ([[https://www.latex-project.org/get/][TexLive, MacTex or MikTeX]]): Preview LaTex and export Org to PDF
-  - =divpng=: Part of LaTeX
-- =hunspell=: Spellcheck. Also requires a hunspell dictionary
-- Search inside files
-  - =grep=
-  - =ripgrep=: Faster alternative for grep
-- View PDF files
-  - =gs= ([[https://www.ghostscript.com/][GhostScript]]): View PDF files
-  - =mutool= ([[https://mupdf.com/][MuPDF]]): View PDF files
-- Play music
-  - =mpg321=, =ogg123= ([[https://www.xiph.org/][vorbis-tools]]), =mplayer=, =mpv=, =vlc=
+When EWS starts and some of the listed software is missing, the =*Messages*= buffer will list any missing software. The core functionality of Emacs will work fine without this software, but some specialised tasks require assistance from this software.
+
+Installing these packages depends on your operating system.
+
+Some of the listed packages are alternatives for each other, so you only need to install one of them.
+
+** Inspiration
+- ~gs~ ([[https://www.ghostscript.com/][GhostScript]]) or ~mutool~ ([[https://mupdf.com/][MuPDF]]): View PDF files
+- ~pdftotext~ ([[https://poppler.freedesktop.org/][poppler-utils]]): Convert PDF to text (enable search)
+- ~soffice~ ([[https://www.libreoffice.org/][LibreOffice]]): View and create office documents
+- ~zip~: Unpack ePub documents
+- ~ddjvu~ ([[http://djvu.org/][DjVuLibre]]): View DjVu files
+- ~curl~: Reading RSS feeds
+- ~mpg321~, ~ogg123~ ([[https://www.xiph.org/][vorbis-tools]]), ~mplayer~, ~mpv~, or ~vlc~: Play music and watch videos
+  
+** Ideation
+- ~grep~ or ~ripgrep~: Search inside files
+    
+** Production
+- ~hunspell~: Spellcheck. Also requires a hunspell dictionary
+- ~divpng~: Preview mathematical notation (part of LaTeX)
+- ~git~: Version control
+      
+** Publication
+- ~convert~ ([[https://imagemagick.org/][ImageMagick]]) or =gm= ([[http://www.graphicsmagick.org/][GraphicsMagick]]): Convert image files
+- ~latex~ ([[https://www.latex-project.org/get/][TexLive, MacTex or MikTeX]]): Preview LaTeX and export Org to PDF
+- ~zip~: Create ePub and office documents
+
+To export the /Emacs Writing Studio/ book Org files you will also must install [[https://graphviz.org/][Graphviz]] to generate various diagrams. 
+
+* Compiling the EWS book
+This repository contains the Org mode source files for the /Emacs Writing Studio/ book.
+
+To compile the book as a PDF, ePub or other format you need the EWS configuration and the required supporting applications listed above. You will also need the [[https://graphviz.org/][Graphviz]] software, which draws some of the diagrams used in the book. Run the Org export function from the =00-emacs-writing-studio.org= file to generate the book.
