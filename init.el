@@ -88,8 +88,10 @@
 ;;; LOOK AND FEEL
 
 (tool-bar-mode -1)
-(menu-bar-mode -1)
-(scroll-bar-mode -1)
+; I'm learning Emacs and the menu bar is helpful 
+(menu-bar-mode 1)   
+;; I don't object to the scroll bar
+(scroll-bar-mode 1) 
 
 ;; Short answers only please
 
