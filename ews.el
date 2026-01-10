@@ -289,7 +289,7 @@ Customise `titlecase-style' for styling."
 	   (org-edit-headline new-heading)))))))
 
 ;; Fixed by Prot
-(defun ews-denote-link-description-title-case (file)
+(defun ews-denote-link-description-title-case (file file-type)
   "Return link description for FILE.
 
 If the region is active, use it as the description.
@@ -298,8 +298,7 @@ The title is formatted with the `titlecase' package.
 This function is useful as the value of `denote-link-description-function' to
 generate links in titlecase for attachments."
   (require 'titlecase)
-  (let* ((file-type (denote-filetype-heuristics file))
-         (title (denote-retrieve-title-or-filename file file-type)))
+  (let* ((title (denote-retrieve-title-or-filename file file-type)))
     (cond
      ((denote--get-active-region-content))
      ((or (null title) (string-blank-p title))
